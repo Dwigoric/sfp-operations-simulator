@@ -8,6 +8,7 @@ import router from './router'
 
 // Import stylesheets
 import './assets/main.css'
+import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 
 // Build the app
