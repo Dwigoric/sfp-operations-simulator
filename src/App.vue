@@ -23,9 +23,10 @@ const binary2 = ref('')
     </div>
 
     <div id="binary-input">
-        <h2>Binary numbers to add</h2>
+        <h2 class="mb-3">Binary numbers to add</h2>
         <VTextField v-model="binary1" label="Binary 1" />
-        <VIcon icon="mdi-plus-circle"></VIcon>
+        <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
+        <VSpacer class="mb-5" />
         <VTextField v-model="binary2" label="Binary 2" />
     </div>
 
@@ -37,5 +38,13 @@ const binary2 = ref('')
     width: 100%;
     display: flex;
     justify-content: space-between;
+}
+
+#binary-input {
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: stretch;
 }
 </style>
