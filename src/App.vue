@@ -7,6 +7,15 @@ const roundingMethod = ref(true)
 
 const binary1 = ref('')
 const binary2 = ref('')
+
+// Functions
+const checkBit = (e) => {
+    if (e.inputType === 'insertText') {
+        if (e.data !== '0' && e.data !== '1') {
+            e.preventDefault()
+        }
+    }
+}
 </script>
 
 <template>
@@ -24,10 +33,10 @@ const binary2 = ref('')
 
     <div id="binary-input">
         <h2 class="mb-3">Binary numbers to add</h2>
-        <VOtpInput v-model="binary1" length="32" variant="underlined" />
+        <VOtpInput v-model="binary1" length="32" variant="underlined" @beforeinput="checkBit" />
         <VSpacer class="mt-5" />
         <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
-        <VOtpInput v-model="binary2" length="32" variant="underlined" />
+        <VOtpInput v-model="binary2" length="32" variant="underlined" @beforeinput="checkBit" />
     </div>
 
     <div></div>
