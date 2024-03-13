@@ -24,10 +24,10 @@ const binary2 = ref('')
 
     <div id="binary-input">
         <h2 class="mb-3">Binary numbers to add</h2>
-        <VTextField v-model="binary1" label="Binary 1" />
+        <VOtpInput v-model="binary1" length="32" variant="underlined" />
+        <VSpacer class="mt-5" />
         <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
-        <VSpacer class="mb-5" />
-        <VTextField v-model="binary2" label="Binary 2" />
+        <VOtpInput v-model="binary2" length="32" variant="underlined" />
     </div>
 
     <div></div>
@@ -46,5 +46,9 @@ const binary2 = ref('')
     flex-flow: column nowrap;
     justify-content: center;
     align-items: stretch;
+}
+
+#binary-input >>> .v-otp-input__content {
+    max-width: 100%;
 }
 </style>
