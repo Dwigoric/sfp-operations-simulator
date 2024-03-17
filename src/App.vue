@@ -3,7 +3,7 @@
 import { ref } from 'vue'
 
 // Refs
-const roundingMethod = ref(true)
+const useGrs = ref(false)
 const rawInput = ref(false)
 
 const binary1 = ref('')
@@ -34,11 +34,11 @@ const checkBit = (e) => {
         </div>
         <div>
             <h2>Rounding method</h2>
-            <VSwitch id="rounding-method" v-model="roundingMethod">
+            <VSwitch id="rounding-method" v-model="useGrs">
                 <template #label>
                     <VDialogBottomTransition>
-                        <div v-if="roundingMethod">RTN-TE</div>
-                        <div v-else>G/R/S</div>
+                        <div v-if="useGrs">G/R/S</div>
+                        <div v-else>RTN-TE</div>
                     </VDialogBottomTransition>
                 </template>
             </VSwitch>
