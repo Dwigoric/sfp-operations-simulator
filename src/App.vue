@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 // Refs
 const roundingMethod = ref(true)
+const rawInput = ref(false)
 
 const binary1 = ref('')
 const binary2 = ref('')
@@ -19,30 +20,48 @@ const checkBit = (e) => {
 </script>
 
 <template>
-    <div>
-        <h2>Choose your rounding method:</h2>
-        <VSwitch id="rounding-method" v-model="roundingMethod">
-            <template #label>
-                <VDialogBottomTransition>
-                    <div v-if="roundingMethod">RTN-TE</div>
-                    <div v-else>G/R/S</div>
-                </VDialogBottomTransition>
-            </template>
-        </VSwitch>
+    <div id="switches">
+        <div>
+            <h2>Input method</h2>
+            <VSwitch id="rounding-method" v-model="rawInput">
+                <template #label>
+                    <VDialogBottomTransition>
+                        <div v-if="rawInput">Binary</div>
+                        <div v-else>Base-2</div>
+                    </VDialogBottomTransition>
+                </template>
+            </VSwitch>
+        </div>
+        <div>
+            <h2>Rounding method</h2>
+            <VSwitch id="rounding-method" v-model="roundingMethod">
+                <template #label>
+                    <VDialogBottomTransition>
+                        <div v-if="roundingMethod">RTN-TE</div>
+                        <div v-else>G/R/S</div>
+                    </VDialogBottomTransition>
+                </template>
+            </VSwitch>
+        </div>
     </div>
 
-    <div id="binary-input">
-        <h2 class="mb-3">Binary numbers to add</h2>
-        <VOtpInput v-model="binary1" length="32" variant="underlined" @beforeinput="checkBit" />
-        <VSpacer class="mt-5" />
-        <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
-        <VOtpInput v-model="binary2" length="32" variant="underlined" @beforeinput="checkBit" />
-    </div>
-
-    <div></div>
+    <VExpandTransition>
+        <div v-if="rawInput" id="binary-input">
+            <h2 class="mb-3">Binary numbers to add</h2>
+            <VOtpInput v-model="binary1" length="32" variant="underlined" @beforeinput="checkBit" />
+            <VSpacer class="mt-5" />
+            <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
+            <VOtpInput v-model="binary2" length="32" variant="underlined" @beforeinput="checkBit" />
+        </div>
+    </VExpandTransition>
 </template>
 
 <style scoped>
+#switches {
+    display: flex;
+    justify-content: space-around;
+}
+
 #rounding-method {
     width: 100%;
     display: flex;
@@ -55,9 +74,9 @@ const checkBit = (e) => {
     flex-flow: column nowrap;
     justify-content: center;
     align-items: stretch;
-}
 
-#binary-input >>> .v-otp-input__content {
-    max-width: 100%;
+    :deep(.v-otp-input__content) {
+        max-width: 100%;
+    }
 }
 </style>
