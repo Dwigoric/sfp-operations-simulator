@@ -179,7 +179,7 @@ watch(base2_maxDigits, (newVal) => {
                     />
                 </div>
                 <VSpacer class="mb-3" />
-                <VIcon icon="mdi-plus-thick" style="align-self: center"></VIcon>
+                <VIcon style="align-self: center">mdi-plus</VIcon>
                 <VSpacer class="mt-3" />
                 <div class="base2-field bg-blue-darken-4 rounded-b-xl">
                     <VSwitch v-model="base2_2.sign" class="sign-switch">
