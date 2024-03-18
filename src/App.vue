@@ -178,7 +178,10 @@ watch(base2_maxDigits, (newVal) => {
     </VExpandTransition>
 
     <div id="add-button-wrapper">
-        <VBtn class="bg-orange-darken-3">
+        <VBtn
+            :disabled="rawInput && (binary1.length < 32 || binary2.length < 32)"
+            class="bg-orange-darken-3"
+        >
             <VIcon>mdi-plus</VIcon>
             <span>Add</span>
         </VBtn>
