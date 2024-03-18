@@ -11,13 +11,13 @@ const binary2 = ref('001111111' + '0'.repeat(23))
 const base2_maxDigits = ref(7)
 
 const base2_1 = reactive({
-    sign: 0,
+    sign: false,
     exponent: 0,
     mantissa: '0000000'
 })
 
 const base2_2 = reactive({
-    sign: 0,
+    sign: false,
     exponent: 0,
     mantissa: '0000000'
 })
@@ -70,11 +70,11 @@ const simulate = () => {
         info.op2.exponent = parseInt(binary2.value.slice(1, 9), 2) - 127
         info.op2.mantissa = '1' + binary2.value.slice(9)
     } else {
-        info.op1.sign = base2_1.sign
+        info.op1.sign = base2_1.sign ? 1 : 0
         info.op1.exponent = base2_1.exponent
         info.op1.mantissa = '1' + base2_1.mantissa
 
-        info.op2.sign = base2_2.sign
+        info.op2.sign = base2_2.sign ? 1 : 0
         info.op2.exponent = base2_2.exponent
         info.op2.mantissa = '1' + base2_2.mantissa
     }
@@ -142,6 +142,12 @@ watch(base2_maxDigits, (newVal) => {
             <h2 class="mb-3">Base-2 to add</h2>
             <div id="base2-fields">
                 <div class="base2-field bg-blue-darken-4 rounded-t-xl">
+                    <VSwitch v-model="base2_1.sign" class="sign-switch">
+                        <template #label>
+                            <VIcon v-if="base2_1.sign">mdi-minus</VIcon>
+                            <VIcon v-else>mdi-plus</VIcon>
+                        </template>
+                    </VSwitch>
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
@@ -173,9 +179,15 @@ watch(base2_maxDigits, (newVal) => {
                     />
                 </div>
                 <VSpacer class="mb-3" />
-                <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
+                <VIcon icon="mdi-plus-thick" style="align-self: center"></VIcon>
                 <VSpacer class="mt-3" />
                 <div class="base2-field bg-blue-darken-4 rounded-b-xl">
+                    <VSwitch v-model="base2_2.sign" class="sign-switch">
+                        <template #label>
+                            <VIcon v-if="base2_2.sign">mdi-minus</VIcon>
+                            <VIcon v-else>mdi-plus</VIcon>
+                        </template>
+                    </VSwitch>
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
@@ -304,6 +316,11 @@ watch(base2_maxDigits, (newVal) => {
     width: 100%;
     display: flex;
     justify-content: space-between;
+}
+
+.sign-switch {
+    display: flex;
+    justify-content: center;
 }
 
 #binary-input {
