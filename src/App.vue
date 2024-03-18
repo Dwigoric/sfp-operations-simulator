@@ -270,6 +270,26 @@ watch(base2_maxDigits, (newVal) => {
                     </div>
                 </VListGroup>
             </VExpandTransition>
+            <VListGroup>
+                <template #activator="{ props }">
+                    <VListItem title="Step 1. Align the exponents" v-bind="props" />
+                </template>
+            </VListGroup>
+            <VListGroup>
+                <template #activator="{ props }">
+                    <VListItem title="Step 2. Perform binary addition" v-bind="props" />
+                </template>
+            </VListGroup>
+            <VListGroup>
+                <template #activator="{ props }">
+                    <VListItem title="Step 3. Normalize the result" v-bind="props" />
+                </template>
+            </VListGroup>
+            <VListGroup>
+                <template #activator="{ props }">
+                    <VListItem title="Step 4. Round the result" v-bind="props" />
+                </template>
+            </VListGroup>
         </VList>
     </div>
 </template>
