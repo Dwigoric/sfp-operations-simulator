@@ -176,6 +176,13 @@ watch(base2_maxDigits, (newVal) => {
             </div>
         </div>
     </VExpandTransition>
+
+    <div id="add-button-wrapper">
+        <VBtn class="bg-orange-darken-3">
+            <VIcon>mdi-plus</VIcon>
+            <span>Add</span>
+        </VBtn>
+    </div>
 </template>
 
 <style scoped>
@@ -238,5 +245,12 @@ watch(base2_maxDigits, (newVal) => {
 
 .v-text-field {
     width: 33rem;
+}
+
+#add-button-wrapper {
+    width: 100%;
+    padding: 3rem 0;
+    display: flex;
+    justify-content: center;
 }
 </style>
