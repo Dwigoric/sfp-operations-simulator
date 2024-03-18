@@ -71,7 +71,7 @@ watch(base2_maxDigits, (newVal) => {
     <div id="switches">
         <div>
             <h2>Input method</h2>
-            <VSwitch id="rounding-method" v-model="rawInput">
+            <VSwitch v-model="rawInput" class="input-switch">
                 <template #label>
                     <VDialogBottomTransition>
                         <div v-if="rawInput">Binary</div>
@@ -82,7 +82,7 @@ watch(base2_maxDigits, (newVal) => {
         </div>
         <div>
             <h2>Rounding method</h2>
-            <VSwitch id="rounding-method" v-model="useGrs">
+            <VSwitch v-model="useGrs" class="input-switch">
                 <template #label>
                     <VDialogBottomTransition>
                         <div v-if="useGrs">G/R/S</div>
@@ -194,7 +194,7 @@ watch(base2_maxDigits, (newVal) => {
     justify-content: space-around;
 }
 
-#rounding-method {
+.input-switch {
     width: 100%;
     display: flex;
     justify-content: space-between;
