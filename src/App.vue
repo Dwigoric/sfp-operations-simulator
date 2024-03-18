@@ -108,7 +108,7 @@ watch(base2_maxDigits, (newVal) => {
             </div>
             <h2 class="mb-3">Base-2 to add</h2>
             <div id="base2-fields">
-                <div class="base2-field bg-blue-darken-4">
+                <div class="base2-field bg-blue-darken-4 rounded-t-xl">
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
@@ -142,7 +142,7 @@ watch(base2_maxDigits, (newVal) => {
                 <VSpacer class="mb-3" />
                 <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
                 <VSpacer class="mt-3" />
-                <div class="base2-field bg-blue-darken-4">
+                <div class="base2-field bg-blue-darken-4 rounded-b-xl">
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
