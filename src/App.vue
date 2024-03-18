@@ -31,9 +31,17 @@ const checkBit = (e) => {
     }
 }
 
-const checkExponent = (e) => {
+const checkExponent = (e, base2) => {
     if (e.inputType === 'insertText') {
         if (e.data !== '-' && e.data !== '+' && isNaN(e.data)) {
+            e.preventDefault()
+        }
+
+        // Prevent the exponent from being too large or too small
+        if (base2.exponent < -12 || (base2.exponent === -12 && parseInt(e.data, 10) >= 7)) {
+            e.preventDefault()
+        }
+        if (base2.exponent > 12 || (base2.exponent === 12 && parseInt(e.data, 10) >= 8)) {
             e.preventDefault()
         }
     }
@@ -114,9 +122,21 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-chevron-up</VIcon>
                     <VTextField
                         v-model.number="base2_1.exponent"
+                        append-inner-icon="mdi-chevron-up"
                         hide-details
+                        prepend-inner-icon="mdi-chevron-down"
                         single-line
-                        @beforeinput="checkExponent"
+                        @beforeinput="(e) => checkExponent(e, base2_1)"
+                        @click:prepend-inner="
+                            () => {
+                                base2_1.exponent = Math.max(-126, base2_1.exponent - 1)
+                            }
+                        "
+                        @click:append-inner="
+                            () => {
+                                base2_1.exponent = Math.min(127, base2_1.exponent + 1)
+                            }
+                        "
                     />
                 </div>
                 <VSpacer class="mb-3" />
@@ -136,9 +156,21 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-chevron-up</VIcon>
                     <VTextField
                         v-model.number="base2_2.exponent"
+                        append-inner-icon="mdi-chevron-up"
                         hide-details
+                        prepend-inner-icon="mdi-chevron-down"
                         single-line
-                        @beforeinput="checkExponent"
+                        @beforeinput="(e) => checkExponent(e, base2_2)"
+                        @click:prepend-inner="
+                            () => {
+                                base2_2.exponent = Math.max(-126, base2_2.exponent - 1)
+                            }
+                        "
+                        @click:append-inner="
+                            () => {
+                                base2_2.exponent = Math.min(127, base2_2.exponent + 1)
+                            }
+                        "
                     />
                 </div>
             </div>
@@ -205,6 +237,6 @@ watch(base2_maxDigits, (newVal) => {
 }
 
 .v-text-field {
-    width: 20rem;
+    width: 33rem;
 }
 </style>
