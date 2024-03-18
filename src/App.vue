@@ -11,15 +11,28 @@ const binary2 = ref('001111111' + '0'.repeat(23))
 const base2_maxDigits = ref(7)
 
 const base2_1 = reactive({
-    magnitude: '0000000',
+    sign: 0,
     exponent: 0,
-    sign: 0
+    mantissa: '0000000'
 })
 
 const base2_2 = reactive({
-    magnitude: '0000000',
+    sign: 0,
     exponent: 0,
-    sign: 0
+    mantissa: '0000000'
+})
+
+const info = reactive({
+    op1: {
+        sign: 0,
+        exponent: 0,
+        mantissa: '0000000'
+    },
+    op2: {
+        sign: 0,
+        exponent: 0,
+        mantissa: '0000000'
+    }
 })
 
 // Functions
@@ -47,22 +60,42 @@ const checkExponent = (e, base2) => {
     }
 }
 
+const simulate = () => {
+    if (rawInput.value) {
+        info.op1.sign = parseInt(binary1.value[0], 10)
+        info.op1.exponent = parseInt(binary1.value.slice(1, 9), 2) - 127
+        info.op1.mantissa = '1' + binary1.value.slice(9)
+
+        info.op2.sign = parseInt(binary2.value[0], 10)
+        info.op2.exponent = parseInt(binary2.value.slice(1, 9), 2) - 127
+        info.op2.mantissa = '1' + binary2.value.slice(9)
+    } else {
+        info.op1.sign = base2_1.sign
+        info.op1.exponent = base2_1.exponent
+        info.op1.mantissa = '1' + base2_1.mantissa
+
+        info.op2.sign = base2_2.sign
+        info.op2.exponent = base2_2.exponent
+        info.op2.mantissa = '1' + base2_2.mantissa
+    }
+}
+
 // Lifecycle hooks
 watch(base2_maxDigits, (newVal) => {
     // Append 0 if the magnitude is shorter than the new max digits
-    if (base2_1.magnitude.length < newVal) {
-        base2_1.magnitude += '0'.repeat(newVal - base2_1.magnitude.length)
+    if (base2_1.mantissa.length < newVal) {
+        base2_1.mantissa += '0'.repeat(newVal - base2_1.mantissa.length)
     }
-    if (base2_2.magnitude.length < newVal) {
-        base2_2.magnitude += '0'.repeat(newVal - base2_2.magnitude.length)
+    if (base2_2.mantissa.length < newVal) {
+        base2_2.mantissa += '0'.repeat(newVal - base2_2.mantissa.length)
     }
 
     // Truncate the magnitude if it's longer than the new max digits
-    if (base2_1.magnitude.length > newVal) {
-        base2_1.magnitude = base2_1.magnitude.slice(0, newVal)
+    if (base2_1.mantissa.length > newVal) {
+        base2_1.mantissa = base2_1.mantissa.slice(0, newVal)
     }
-    if (base2_2.magnitude.length > newVal) {
-        base2_2.magnitude = base2_2.magnitude.slice(0, newVal)
+    if (base2_2.mantissa.length > newVal) {
+        base2_2.mantissa = base2_2.mantissa.slice(0, newVal)
     }
 })
 </script>
@@ -112,7 +145,7 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
-                        v-model="base2_1.magnitude"
+                        v-model="base2_1.mantissa"
                         :length="base2_maxDigits"
                         variant="underlined"
                         @beforeinput="checkBit"
@@ -146,7 +179,7 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-numeric-1</VIcon>
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
-                        v-model="base2_2.magnitude"
+                        v-model="base2_2.mantissa"
                         :length="base2_maxDigits"
                         variant="underlined"
                         @beforeinput="checkBit"
@@ -181,10 +214,63 @@ watch(base2_maxDigits, (newVal) => {
         <VBtn
             :disabled="rawInput && (binary1.length < 32 || binary2.length < 32)"
             class="bg-orange-darken-3"
+            @click.prevent="simulate"
         >
             <VIcon>mdi-plus</VIcon>
             <span>Add</span>
         </VBtn>
+    </div>
+
+    <div id="steps-wrapper">
+        <h2>Step-by-Step Simulation</h2>
+        <VList class="bg-brown-darken-2 rounded-xl">
+            <VExpandTransition>
+                <VListGroup v-if="rawInput" value="Step-0">
+                    <template #activator="{ props }">
+                        <VListItem
+                            title="Step 0. Convert binary to normalized form"
+                            v-bind="props"
+                        />
+                    </template>
+                    <div class="steps-list">
+                        <h3>
+                            Split the binary numbers into their sign, exponent, and mantissa parts
+                        </h3>
+                        <div class="binary-split">
+                            <div>
+                                <h4>Binary 1</h4>
+                                <p>Sign: {{ info.op1.sign }}</p>
+                                <p>Exponent: {{ info.op1.exponent }}</p>
+                                <p>Mantissa: {{ info.op1.mantissa }}</p>
+                            </div>
+                            <div>
+                                <h4>Binary 2</h4>
+                                <p>Sign: {{ info.op2.sign }}</p>
+                                <p>Exponent: {{ info.op2.exponent }}</p>
+                                <p>Mantissa: {{ info.op2.mantissa }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="steps-list">
+                        <h3>Formulate the base-2 form</h3>
+                        <div class="binary-split">
+                            <p>
+                                Operand 1: {{ info.op1.sign === 1 ? '-' : '+' }}1.{{
+                                    info.op1.mantissa
+                                }}
+                                * 2^{{ info.op1.exponent }}
+                            </p>
+                            <p>
+                                Operand 2: {{ info.op2.sign === 1 ? '-' : '+' }}1.{{
+                                    info.op2.mantissa
+                                }}
+                                * 2^{{ info.op2.exponent }}
+                            </p>
+                        </div>
+                    </div>
+                </VListGroup>
+            </VExpandTransition>
+        </VList>
     </div>
 </template>
 
@@ -255,5 +341,28 @@ watch(base2_maxDigits, (newVal) => {
     padding: 3rem 0;
     display: flex;
     justify-content: center;
+}
+
+#steps-wrapper {
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.steps-list {
+    padding: 1.2rem;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.binary-split {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    align-items: stretch;
+    font-weight: bold;
 }
 </style>
