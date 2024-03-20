@@ -129,10 +129,25 @@ watch(base2_maxDigits, (newVal) => {
     <VExpandTransition>
         <div v-if="rawInput" id="binary-input">
             <h2 class="mb-3">Binary numbers to add (s, e, m)</h2>
-            <VOtpInput v-model="binary1" length="32" variant="underlined" @beforeinput="checkBit" />
-            <VSpacer class="mt-5" />
-            <VIcon icon="mdi-plus" style="align-self: center"></VIcon>
-            <VOtpInput v-model="binary2" length="32" variant="underlined" @beforeinput="checkBit" />
+            <VOtpInput
+                v-model="binary1"
+                class="rounded-t-xl rounded-b-0 bg-purple-darken-4 pt-3"
+                length="32"
+                variant="underlined"
+                @beforeinput="checkBit"
+            />
+            <VIcon
+                class="bg-purple-darken-4 w-100 py-6"
+                icon="mdi-plus"
+                style="align-self: center"
+            ></VIcon>
+            <VOtpInput
+                v-model="binary2"
+                class="rounded-b-xl rounded-t-0 bg-purple-darken-4 pb-7"
+                length="32"
+                variant="underlined"
+                @beforeinput="checkBit"
+            />
         </div>
         <div v-else id="base2-input">
             <div>
