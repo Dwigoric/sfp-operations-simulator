@@ -2,6 +2,9 @@
 // Import packages
 import { reactive, ref, watch } from 'vue'
 
+// Utils
+import { alignExponent } from './util.js'
+
 // Refs
 const useGrs = ref(false)
 const rawInput = ref(false)
@@ -32,6 +35,18 @@ const info = reactive({
         sign: 0,
         exponent: 0,
         mantissa: '0000000'
+    },
+    aligned: {
+        op1: {
+            sign: 0,
+            exponent: 0,
+            magnitude: '1.0000000'
+        },
+        op2: {
+            sign: 0,
+            exponent: 0,
+            magnitude: '1.0000000'
+        }
     }
 })
 
@@ -64,20 +79,25 @@ const simulate = () => {
     if (rawInput.value) {
         info.op1.sign = parseInt(binary1.value[0], 10)
         info.op1.exponent = parseInt(binary1.value.slice(1, 9), 2) - 127
-        info.op1.mantissa = '1' + binary1.value.slice(9)
+        info.op1.mantissa = binary1.value.slice(9)
 
         info.op2.sign = parseInt(binary2.value[0], 10)
         info.op2.exponent = parseInt(binary2.value.slice(1, 9), 2) - 127
-        info.op2.mantissa = '1' + binary2.value.slice(9)
+        info.op2.mantissa = binary2.value.slice(9)
     } else {
         info.op1.sign = base2_1.sign ? 1 : 0
         info.op1.exponent = base2_1.exponent
-        info.op1.mantissa = '1' + base2_1.mantissa
+        info.op1.mantissa = base2_1.mantissa
 
         info.op2.sign = base2_2.sign ? 1 : 0
         info.op2.exponent = base2_2.exponent
-        info.op2.mantissa = '1' + base2_2.mantissa
+        info.op2.mantissa = base2_2.mantissa
     }
+
+    // Step 1: Align the exponents
+    const aligned = alignExponent(info.op1, info.op2)
+    info.aligned.op1 = aligned.op1
+    info.aligned.op2 = aligned.op2
 }
 
 // Lifecycle hooks
@@ -301,6 +321,26 @@ watch(base2_maxDigits, (newVal) => {
                 <template #activator="{ props }">
                     <VListItem title="Step 1. Align the exponents" v-bind="props" />
                 </template>
+                <h3 v-if="info.op1.exponent === info.op2.exponent" class="steps-list">
+                    Since the exponents are already aligned, no further action is needed.
+                </h3>
+                <div v-else class="steps-list">
+                    <h3>Align the exponents in favor of the operand with the smaller exponent.</h3>
+                    <div class="binary-split">
+                        <div>
+                            <h4>Aligned Operand 1</h4>
+                            <p>Sign: {{ info.aligned.op1.sign }}</p>
+                            <p>Exponent: {{ info.aligned.op1.exponent }}</p>
+                            <p>Magnitude: {{ info.aligned.op1.magnitude }}</p>
+                        </div>
+                        <div>
+                            <h4>Aligned Operand 2</h4>
+                            <p>Sign: {{ info.aligned.op2.sign }}</p>
+                            <p>Exponent: {{ info.aligned.op2.exponent }}</p>
+                            <p>Magnitude: {{ info.aligned.op2.magnitude }}</p>
+                        </div>
+                    </div>
+                </div>
             </VListGroup>
             <VListGroup>
                 <template #activator="{ props }">
