@@ -1,1 +1,60 @@
 // This file contains the utility functions used in the application.
+
+function alignExponent(info) {
+    const { op1, op2 } = JSON.parse(JSON.stringify(info)); // Deep copy
+
+    // Initialize base integer to 1 for both operands
+    op1.integer = 1;
+    op2.integer = 1;
+
+    // Normalize op1
+    while (op1.mantissa[0] === '0' && op1.mantissa.length > 1) {
+        op1.mantissa = op1.mantissa.slice(1) + '0';
+        op1.exponent--;
+    }
+
+    // Normalize op2
+    while (op2.mantissa[0] === '0' && op2.mantissa.length > 1) {
+        op2.mantissa = op2.mantissa.slice(1) + '0';
+        op2.exponent--;
+    }
+
+    // Adjust exponents to be equal
+    while (op1.exponent < op2.exponent) {
+        op1.mantissa = '0' + op1.mantissa.slice(0, -1);
+        op1.exponent++;
+    }
+    while (op2.exponent < op1.exponent) {
+        op2.mantissa = '0' + op2.mantissa.slice(0, -1);
+        op2.exponent++;
+    }
+
+    const op1Exp = Math.abs(info.op1.exponent); // Taking absolute value
+    const op2Exp = Math.abs(info.op2.exponent); // Taking absolute value
+
+    if (op1Exp > op2Exp) {
+        if (op1.mantissa[0] === '0') {
+            op1.integer = 0;
+        }
+    } else if (op1Exp < op2Exp) {
+        if (op2.mantissa[0] === '0') {
+            op2.integer = 0;
+        }
+    }
+
+    op1.magnitude = op1.integer + "." + op1.mantissa;
+    op2.magnitude = op2.integer + "." + op2.mantissa;
+
+    return {
+        op1: {
+            sign: op1.sign,
+            exponent: op1.exponent,
+            magnitude: op1.magnitude
+        },
+        op2: {
+            sign: op2.sign,
+            exponent: op2.exponent,
+            magnitude: op2.magnitude
+        }
+    };
+}
