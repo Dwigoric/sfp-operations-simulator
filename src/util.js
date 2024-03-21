@@ -32,14 +32,10 @@ const alignExponent = (inputOp1, inputOp2) => {
     const op1Exp = Math.abs(inputOp1.exponent) // Taking absolute value
     const op2Exp = Math.abs(inputOp2.exponent) // Taking absolute value
 
-    if (op1Exp > op2Exp) {
-        if (op1.mantissa[0] === '0') {
-            op1.integer = 0
-        }
-    } else if (op1Exp < op2Exp) {
-        if (op2.mantissa[0] === '0') {
-            op2.integer = 0
-        }
+    if (op1Exp > op2Exp && op1.mantissa[0] === '0') {
+        op1.integer = 0
+    } else if (op1Exp < op2Exp && op2.mantissa[0] === '0') {
+        op2.integer = 0
     }
 
     op1.magnitude = op1.integer + '.' + op1.mantissa
