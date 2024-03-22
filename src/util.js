@@ -83,7 +83,8 @@ const alignExponent = (inputOp1, inputOp2) => {
         }
     }
 }
-const mantissaBinaryToDecimal = (mantissa) => {
+
+const mantissaBinaryToDecimal = (mantissa) => { // 1010101
     let total = 0
     for (let i = 0; i < mantissa.length; i++) {
         const power = -(i + 1)
@@ -97,7 +98,71 @@ const mantissaBinaryToDecimal = (mantissa) => {
     return total
 }
 
-const addOperands = (op1, op2) => {}
+const decimalToBinary = (decimal) => {
+    if (decimal === 0) {
+        return '0'
+    }
+
+    let binary = ''
+    while (decimal > 0) {
+        binary = (decimal % 2) + binary
+        decimal = Math.floor(decimal / 2)
+    }
+
+    return binary
+}
+
+// {X} get mantissa substring 1 . 11111
+// {X} convert mantissa binary to decimal
+// {X} add them
+// {X} decimal add/sub
+// {} convert sum to binary
+
+// addition > normalization > round
+const addOperands = (op1, op2) => {
+
+    let op1Partition = op1.magnitude.split('.')
+    let op2Partition = op2.magnitude.split('.')
+
+    let value1 = parseInt(op1Partition[0]) + mantissaBinaryToDecimal(op1Partition[1])
+    let value2 = parseInt(op2Partition[0]) + mantissaBinaryToDecimal(op2Partition[1])
+
+    let sum = 0
+    let exponent = op1.exponent
+    let sign = 0
+
+    // -5 + 1; 5 - 1 = 4; -4
+    // 1 + -5; 5 - 1 = 4; -4
+    // -5 + 5 = 0
+
+    // Addition
+    if (op1.sign === op2.sign) {
+        sum = value1 + value2
+        sign = op1.sign && op2.sign // any sign
+    } else {
+        if (value1 > value2) {
+            sum = value1 - value2
+            sign = op1.sign
+        } else if (value1 < value2) {
+            sum = value2 - value1
+            sign = op2.sign
+        } else { // Subtraction
+            sum = value1 - value2
+            sign = 0 // positive if equal
+        }
+    }
+
+    sum = decimalToBinary(sum) // not normalized
+
+    //Convert sum to binary
+    return {
+        sum: {
+            sign: sign,
+            exponent: exponent,
+            magnitude: sum
+        }
+    }
+}
 
 const normalizeSum = (rawSum) => {
     let rawMagnitude = rawSum.magnitude;
@@ -152,6 +217,7 @@ export { alignExponent, addOperands }
 // If sign = same, then add normally and copy the sign
 // If sign = different, then subtract smaller magnitude from bigger magnitude and copy sign of bigger
 
+// -5 + 3 =
 //+5 + -3 = 5-3, 2
 
 // +1.0110 x 10^5
