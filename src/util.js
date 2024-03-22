@@ -1,7 +1,7 @@
 // This file contains the utility functions used in the application.
 
 const alignExponent = (inputOp1, inputOp2) => {
-    const { op1, op2 } = JSON.parse(JSON.stringify({ op1: inputOp2, op2: inputOp2 })) // Deep copy
+    const { op1, op2 } = JSON.parse(JSON.stringify({ op1: inputOp1, op2: inputOp2 })) // Deep copy
 
     // Special Case: Exponents are equal, don't normalize
     if (op1.exponent === op2.exponent) {
