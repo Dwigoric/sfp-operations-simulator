@@ -3,23 +3,23 @@
 const alignExponent = (inputOp1, inputOp2) => {
     const { op1, op2 } = JSON.parse(JSON.stringify({ op1: inputOp1, op2: inputOp2 })) // Deep copy
 
-    op1.integer = 1;
-    op2.integer = 1;
+    op1.integer = 1
+    op2.integer = 1
 
-    let diff = Math.abs(op1.exponent - op2.exponent);
+    let diff = Math.abs(op1.exponent - op2.exponent)
 
     if (op1.exponent < op2.exponent) {
-        op1.mantissa = shift(op1.mantissa, diff, op1.mantissa.length, op1.integer);
-        op1.exponent = op2.exponent;
-        op1.integer = 0;
+        op1.mantissa = shift(op1.mantissa, diff, op1.mantissa.length, op1.integer)
+        op1.exponent = op2.exponent
+        op1.integer = 0
     } else if (op1.exponent > op2.exponent) {
-        op2.mantissa = shift(op2.mantissa, diff, op2.mantissa.length, op2.integer);
-        op2.exponent = op1.exponent;
-        op2.integer = 0;
+        op2.mantissa = shift(op2.mantissa, diff, op2.mantissa.length, op2.integer)
+        op2.exponent = op1.exponent
+        op2.integer = 0
     }
 
-    op1.magnitude = op1.integer + "." + op1.mantissa;
-    op2.magnitude = op2.integer + "." + op2.mantissa;
+    op1.magnitude = op1.integer + '.' + op1.mantissa
+    op2.magnitude = op2.integer + '.' + op2.mantissa
 
     return {
         op1: {
@@ -32,22 +32,22 @@ const alignExponent = (inputOp1, inputOp2) => {
             exponent: op2.exponent,
             magnitude: op2.magnitude
         }
-    };
+    }
 }
 
 const shift = (str, offset, len, int) => {
-    offset = Math.min(offset, len);
-    let str_shift = "";
+    offset = Math.min(offset, len)
+    let str_shift = ''
     for (let i = 0; i < offset; i++) {
         if (i + 1 === offset) {
-            str_shift += int;
-            continue;
+            str_shift += int
+            continue
         }
-        str_shift += '0';
+        str_shift += '0'
     }
-    str_shift += str.substring(0, len - offset);
+    str_shift += str.substring(0, len - offset)
 
-    return str_shift;
+    return str_shift
 }
 
 const mantissaBinaryToDecimal = (mantissa) => { // 1010101
@@ -57,7 +57,7 @@ const mantissaBinaryToDecimal = (mantissa) => { // 1010101
         const bit = mantissa[i]
 
         if (bit === 1) {
-            total += Math.power(2, power)
+            total += Math.pow(2, power)
         }
     }
 
@@ -131,25 +131,24 @@ const addOperands = (op1, op2) => {
 }
 
 const normalizeSum = (rawSum) => {
-    let rawMagnitude = rawSum.magnitude;
-    const posDecimal = rawMagnitude.indexOf('.');
-    const pos1 = rawMagnitude.indexOf('1');
-    let offset = 0;
+    let rawMagnitude = rawSum.magnitude
+    const posDecimal = rawMagnitude.indexOf('.')
+    const pos1 = rawMagnitude.indexOf('1')
+    let offset = 0
 
-    if(pos1>posDecimal){
-        offset = posDecimal - pos1;
+    if (pos1 > posDecimal) {
+        offset = posDecimal - pos1
+    } else if (pos1 < posDecimal) {
+        offset = posDecimal - pos1 - 1
+        rawMagnitude = rawMagnitude.substring(0, posDecimal) + rawMagnitude.substring(posDecimal + 1)
     }
-    else if(pos1<posDecimal){
-        offset = posDecimal - pos1 - 1;
-        rawMagnitude = rawMagnitude.substring(0, posDecimal) + rawMagnitude.substring(posDecimal+1);
-    }
 
-    let remainingMagnitude = rawMagnitude.substring(pos1 + 1);
+    let remainingMagnitude = rawMagnitude.substring(pos1 + 1)
 
-    let formattedMagnitude = "1." + remainingMagnitude;
+    let formattedMagnitude = '1.' + remainingMagnitude
 
-    while(formattedMagnitude.length < rawSum.magnitude.length){
-        formattedMagnitude = formattedMagnitude + "0"
+    while (formattedMagnitude.length < rawSum.magnitude.length) {
+        formattedMagnitude = formattedMagnitude + '0'
     }
 
     const normalizedSum = {
@@ -158,11 +157,10 @@ const normalizeSum = (rawSum) => {
         magnitude: formattedMagnitude
     }
 
-    return normalizedSum;
+    return normalizedSum
 }
 
 export { alignExponent, addOperands }
-
 
 
 //NOTES-------------------------------------
@@ -179,7 +177,7 @@ export { alignExponent, addOperands }
 // }
 
 // 1.10101 - 0.01100 = result & sign of 1.10101
-// 
+//
 // If sign = same, then add normally and copy the sign
 // If sign = different, then subtract smaller magnitude from bigger magnitude and copy sign of bigger
 
