@@ -100,3 +100,31 @@ const mantissaBinaryToDecimal = (mantissa) => {
 const addOperands = (op1, op2) => {}
 
 export { alignExponent, addOperands }
+
+
+
+
+// op1: {
+//     sign: 0,
+//     exponent: op1.exponent,
+//     magnitude: 1.10101
+// },
+// op2: {
+//     sign: 1,
+//     exponent: op2.exponent,
+//     magnitude: 0.01100
+// }
+
+// 1.10101 - 0.01100 = result & sign of 1.10101
+// 
+// If sign = same, then add normally and copy the sign
+// If sign = different, then subtract smaller magnitude from bigger magnitude and copy sign of bigger
+
+//+5 + -3 = 5-3, 2
+
+// +1.0110 x 10^5
+// op1: {
+//     sign: 0,
+//     exponent: 5,
+//     magnitude: 1.0110
+// },
