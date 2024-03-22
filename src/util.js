@@ -99,10 +99,40 @@ const mantissaBinaryToDecimal = (mantissa) => {
 
 const addOperands = (op1, op2) => {}
 
+const normalizeSum = (rawSum) => {
+    let rawMagnitude = rawSum.magnitude;
+    const posDecimal = rawMagnitude.indexOf('.');
+    const pos1 = rawMagnitude.indexOf('1');
+    let offset = 0;
+
+    if(pos1>posDecimal){
+        offset = posDecimal - pos1;
+    }
+    else if(pos1<posDecimal){
+        offset = posDecimal - pos1 - 1;
+    }
+
+    let remainingMagnitude = rawMagnitude.substring(pos1 + 1);
+    let formattedMagnitude = "1." + remainingMagnitude;
+
+    while(formattedMagnitude.length < rawMagnitude.length){
+        formattedMagnitude = formattedMagnitude + "0"
+    }
+
+    const normalizedSum = {
+        sign: rawSum.sign,
+        exponent: rawSum.exponent + offset,
+        magnitude: formattedMagnitude
+    }
+
+    return normalizedSum;
+}
+
 export { alignExponent, addOperands }
 
 
 
+//NOTES-------------------------------------
 
 // op1: {
 //     sign: 0,
@@ -124,7 +154,35 @@ export { alignExponent, addOperands }
 
 // +1.0110 x 10^5
 // op1: {
-//     sign: 0,
-//     exponent: 5,
-//     magnitude: 1.0110
+//     sign: (int),
+//     exponent: (int),
+//     magnitude: (string)
 // },
+
+// 1. convert magnitude into string (actually alr done)
+// 2. detect the position of the decimal point
+// 3. detect the position of the first 1
+
+// 4. calculate offset
+// ex. 0.010                    left = bigger offset, right = smaller offset
+//  posDecimal = 1
+//  pos1 = 3
+//  if pos1 > posDecimal, offset = posDecimal - pos1 = 1 - 3 = -2
+// ex2. 100.0
+//  posDecimal = 3
+//  pos1 = 0
+//  if pos1 < posDecimal, offset = posDecimal - pos1 - 1 = 3 - 0 - 1 = +2
+
+// 5. save all characters after the first 1 in a remainingMagnitude string
+
+// 6. reformat string into "1." concatenated with remainingMagnitude, save in a formattedMagnitude string
+// 7. compare length of new string with original, and if it's shorter, concatenate 0s until it matches the length
+
+// 8. DONE, formattedMagnitude should be normalized (use offset to adjust exponent field after, and replace magnitude field obviously)
+// ex. 0.0110
+//  posDecimal = 1, pos1 = 3
+//  since pos1 > posDecimal, offset = posDecimal - pos1 = 1 - 3 = -2
+//  remainingMagnitude = "10"
+//  formattedMagnitude = "1.10", but since its length is 2 while original is 4, add two "0"s
+//  formattedMagnitude = "1.1000" with an offset of -2
+//  Done
