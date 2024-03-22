@@ -325,7 +325,7 @@ watch(base2_maxDigits, (newVal) => {
                     Since the exponents are already aligned, no further action is needed.
                 </h3>
                 <div v-else class="steps-list">
-                    <h3>Align the exponents in favor of the operand with the smaller exponent.</h3>
+                    <h3>Align the exponents in favor of the operand with the larger exponent.</h3>
                     <div class="binary-split">
                         <div>
                             <h4>Aligned Operand 1</h4>
