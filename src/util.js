@@ -110,12 +110,14 @@ const normalizeSum = (rawSum) => {
     }
     else if(pos1<posDecimal){
         offset = posDecimal - pos1 - 1;
+        rawMagnitude = rawMagnitude.substring(0, posDecimal) + rawMagnitude.substring(posDecimal+1);
     }
 
     let remainingMagnitude = rawMagnitude.substring(pos1 + 1);
+
     let formattedMagnitude = "1." + remainingMagnitude;
 
-    while(formattedMagnitude.length < rawMagnitude.length){
+    while(formattedMagnitude.length < rawSum.magnitude.length){
         formattedMagnitude = formattedMagnitude + "0"
     }
 
