@@ -1,6 +1,6 @@
 <script setup>
 // Import packages
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref } from 'vue'
 
 // Utils
 import { alignExponent } from './util.js'
@@ -8,21 +8,21 @@ import { alignExponent } from './util.js'
 // Refs
 const useGrs = ref(false)
 const rawInput = ref(false)
+const bitsSupported = ref(10)
 
 const binary1 = ref('001111111' + '0'.repeat(23))
 const binary2 = ref('001111111' + '0'.repeat(23))
-const base2_maxDigits = ref(7)
 
 const base2_1 = reactive({
     sign: false,
     exponent: 0,
-    mantissa: '0000000'
+    mantissa: '0'.repeat(23)
 })
 
 const base2_2 = reactive({
     sign: false,
     exponent: 0,
-    mantissa: '0000000'
+    mantissa: '0'.repeat(23)
 })
 
 const info = reactive({
@@ -75,6 +75,14 @@ const checkExponent = (e, base2) => {
     }
 }
 
+const checkNumber = (e) => {
+    if (e.inputType === 'insertText') {
+        if (isNaN(e.data)) {
+            e.preventDefault()
+        }
+    }
+}
+
 const simulate = () => {
     if (rawInput.value) {
         info.op1.sign = parseInt(binary1.value[0], 10)
@@ -99,29 +107,10 @@ const simulate = () => {
     info.aligned.op1 = aligned.op1
     info.aligned.op2 = aligned.op2
 }
-
-// Lifecycle hooks
-watch(base2_maxDigits, (newVal) => {
-    // Append 0 if the magnitude is shorter than the new max digits
-    if (base2_1.mantissa.length < newVal) {
-        base2_1.mantissa += '0'.repeat(newVal - base2_1.mantissa.length)
-    }
-    if (base2_2.mantissa.length < newVal) {
-        base2_2.mantissa += '0'.repeat(newVal - base2_2.mantissa.length)
-    }
-
-    // Truncate the magnitude if it's longer than the new max digits
-    if (base2_1.mantissa.length > newVal) {
-        base2_1.mantissa = base2_1.mantissa.slice(0, newVal)
-    }
-    if (base2_2.mantissa.length > newVal) {
-        base2_2.mantissa = base2_2.mantissa.slice(0, newVal)
-    }
-})
 </script>
 
 <template>
-    <div id="switches">
+    <div id="user-inputs">
         <div>
             <h2>Input method</h2>
             <VSwitch v-model="rawInput" class="input-switch">
@@ -143,6 +132,10 @@ watch(base2_maxDigits, (newVal) => {
                     </VDialogBottomTransition>
                 </template>
             </VSwitch>
+        </div>
+        <div>
+            <h2>Max number of bits supported</h2>
+            <VTextField v-model="bitsSupported" class="w-100" @beforeinput="checkNumber" />
         </div>
     </div>
 
@@ -170,10 +163,6 @@ watch(base2_maxDigits, (newVal) => {
             />
         </div>
         <div v-else id="base2-input">
-            <div>
-                <h2>Max digits in the mantissa</h2>
-                <VSlider v-model="base2_maxDigits" max="23" min="1" step="1" thumb-label="always" />
-            </div>
             <h2 class="mb-3">Base-2 to add</h2>
             <div id="base2-fields">
                 <div class="base2-field bg-blue-darken-4 rounded-t-xl">
@@ -187,7 +176,7 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
                         v-model="base2_1.mantissa"
-                        :length="base2_maxDigits"
+                        length="23"
                         variant="underlined"
                         @beforeinput="checkBit"
                     />
@@ -227,7 +216,7 @@ watch(base2_maxDigits, (newVal) => {
                     <VIcon>mdi-circle-small</VIcon>
                     <VOtpInput
                         v-model="base2_2.mantissa"
-                        :length="base2_maxDigits"
+                        length="23"
                         variant="underlined"
                         @beforeinput="checkBit"
                     />
@@ -362,7 +351,7 @@ watch(base2_maxDigits, (newVal) => {
 </template>
 
 <style scoped>
-#switches {
+#user-inputs {
     display: flex;
     justify-content: space-around;
 }
@@ -425,7 +414,7 @@ watch(base2_maxDigits, (newVal) => {
 }
 
 .v-text-field {
-    width: 33rem;
+    width: 36rem;
 }
 
 #add-button-wrapper {
