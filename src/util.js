@@ -78,6 +78,42 @@ const decimalToBinary = (decimal) => {
     return binary
 }
 
+const useGRS = (operand, digitsSupported) => {
+
+    let opPartition = operand.magnitude.split('.')
+    let mantissa = opPartition[1]
+
+    digitsSupported = digitsSupported - 1 // remove LHS of binary point in counting
+
+    let binary = ''
+    let stickyBit = '0'
+
+    if (mantissa.length < digitsSupported + 3) {
+        binary = mantissa.padEnd(digitsSupported + 3, '0') // append GRS
+    } else {
+        for (let i = 0; i < mantissa.length; i++) {
+            if (i < digitsSupported + 2) { // copy mantissa + RS
+                binary = binary + mantissa[i]
+            } else { // determine sticky bit
+                if (mantissa[i] === '1') {
+                    stickyBit = '1'
+                    break
+                }
+            }
+        }
+        binary = binary + stickyBit // append sticky bit
+    }
+    binary = opPartition[0] + '.' + binary // recover magnitude w/ GRS
+
+    return {
+        result: {
+            sign: operand.sign,
+            exponent: operand.exponent,
+            magnitude: binary
+        }
+    }
+}
+
 const addOperands = (op1, op2) => {
 
     let op1Partition = op1.magnitude.split('.')
@@ -154,8 +190,9 @@ const RoundRTNTE = () => {
 }
 
 const RoundGRS = () => {
-    
+
 }
+
 
 export { alignExponent, addOperands }
 
