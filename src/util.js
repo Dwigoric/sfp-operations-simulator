@@ -51,17 +51,17 @@ const shift = (str, offset, len, int) => {
 }
 
 const mantissaBinaryToDecimal = (mantissa) => { // 1010101
-    let total = 0
+    let decimal = 0
     for (let i = 0; i < mantissa.length; i++) {
         const power = -(i + 1)
         const bit = mantissa[i]
 
         if (bit === 1) {
-            total += Math.pow(2, power)
+            decimal += Math.pow(2, power)
         }
     }
 
-    return total
+    return decimal
 }
 
 const decimalToBinary = (decimal) => {
@@ -78,54 +78,43 @@ const decimalToBinary = (decimal) => {
     return binary
 }
 
-// {X} get mantissa substring 1 . 11111
-// {X} convert mantissa binary to decimal
-// {X} add them
-// {X} decimal add/sub
-// {} convert sum to binary
-
-// addition > normalization > round
 const addOperands = (op1, op2) => {
 
     let op1Partition = op1.magnitude.split('.')
     let op2Partition = op2.magnitude.split('.')
 
+    // binary to decimal
     let value1 = parseInt(op1Partition[0]) + mantissaBinaryToDecimal(op1Partition[1])
     let value2 = parseInt(op2Partition[0]) + mantissaBinaryToDecimal(op2Partition[1])
 
-    let sum = 0
+    let initialSum = 0
     let exponent = op1.exponent
     let sign = 0
 
-    // -5 + 1; 5 - 1 = 4; -4
-    // 1 + -5; 5 - 1 = 4; -4
-    // -5 + 5 = 0
-
-    // Addition
+    // addition
     if (op1.sign === op2.sign) {
-        sum = value1 + value2
-        sign = op1.sign && op2.sign // any sign
+        initialSum = value1 + value2
+        sign = op1.sign && op2.sign
     } else {
         if (value1 > value2) {
-            sum = value1 - value2
+            initialSum = value1 - value2
             sign = op1.sign
         } else if (value1 < value2) {
-            sum = value2 - value1
+            initialSum = value2 - value1
             sign = op2.sign
         } else { // Subtraction
-            sum = value1 - value2
-            sign = 0 // positive if equal
+            initialSum = value1 - value2
+            sign = 0
         }
     }
 
-    sum = decimalToBinary(sum) // not normalized
+    initialSum = decimalToBinary(initialSum)
 
-    //Convert sum to binary
     return {
-        sum: {
+        result: {
             sign: sign,
             exponent: exponent,
-            magnitude: sum
+            magnitude: initialSum
         }
     }
 }
