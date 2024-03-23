@@ -4,6 +4,8 @@ A simulator for the addition of two single-precision floating-point binary numbe
 
 Web App Link: https://sfp-adder.pages.dev/
 
+Video link: https://youtu.be/9ockmMk023M
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
