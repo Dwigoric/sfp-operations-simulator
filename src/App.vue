@@ -3,7 +3,7 @@
 import { reactive, ref } from 'vue'
 
 // Utils
-import { addOperands, alignExponent, RoundRTNTE, useGRS } from './util.js'
+import { addOperands, alignExponent, normalizeSum, RoundRTNTE, useGRS } from './util.js'
 
 // Refs
 const useGrs = ref(false)
@@ -64,6 +64,11 @@ const info = reactive({
         sign: 0,
         exponent: 0,
         magnitude: '10.0000000'
+    },
+    normalizedSum: {
+        sign: 0,
+        exponent: 1,
+        magnitude: '1.0000000'
     }
 })
 
@@ -149,6 +154,9 @@ const simulate = () => {
 
     // Step 3: Normalize sum
     // Skip to round if the sum is 0
+    info.normalizedSum = info.rawSum.magnitude.includes('1')
+        ? normalizeSum(info.rawSum)
+        : info.rawSum
 
     // Step 4: Round
 
@@ -412,6 +420,12 @@ const simulate = () => {
                 <template #activator="{ props }">
                     <VListItem title="Step 3. Normalize the result" v-bind="props" />
                 </template>
+                <div class="steps-list">
+                    <h3>Normalized Sum</h3>
+                    <p>Sign: {{ info.normalizedSum.sign }}</p>
+                    <p>Exponent: {{ info.normalizedSum.exponent }}</p>
+                    <p>Magnitude: {{ info.normalizedSum.magnitude }}</p>
+                </div>
             </VListGroup>
             <VListGroup>
                 <template #activator="{ props }">
