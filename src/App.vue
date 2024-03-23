@@ -119,12 +119,8 @@ const checkSpecialCase = (binary, errorMsgRef) => {
     const eprime = binary.slice(1, 9)
     const mantissa = binary.slice(9)
 
-    let isSpecialCase = false
-
     // Zero or denormalized
     if (eprime === '0'.repeat(8)) {
-        isSpecialCase = true
-
         if (mantissa.includes('1')) {
             // Denormalized
             errorMsgRef.value = 'Warning: Special Case - Denormalized'
@@ -137,8 +133,6 @@ const checkSpecialCase = (binary, errorMsgRef) => {
             else errorMsgRef.value = 'Warning: Special Case - Negative Zero'
         }
     } else if (eprime === '1'.repeat(8)) {
-        isSpecialCase = true
-
         if (!mantissa.includes('1')) {
             // Infinity
 
@@ -149,15 +143,11 @@ const checkSpecialCase = (binary, errorMsgRef) => {
         } else if (mantissa.startsWith('01')) {
             // Silent NaN
             errorMsgRef.value = 'Error: Special Case - Silent NaN'
-            return -1
         } else {
             // Quiet NaN
             errorMsgRef.value = 'Error: Special Case - Quiet NaN'
-            return -1
         }
     }
-
-    return isSpecialCase
 }
 
 const simulate = () => {
@@ -166,10 +156,39 @@ const simulate = () => {
 
     // Check special cases if the input is raw binary
     if (rawInput.value) {
-        const isSpecialCaseOp1 = checkSpecialCase(binary1.value, errorMessageOp1)
-        const isSpecialCaseOp2 = checkSpecialCase(binary2.value, errorMessageOp2)
+        checkSpecialCase(binary1.value, errorMessageOp1)
+        checkSpecialCase(binary2.value, errorMessageOp2)
 
-        if (isSpecialCaseOp1 === -1 || isSpecialCaseOp2 === -1) {
+        if (errorMessageOp1.value.includes('Positive Infinity')) {
+            if (errorMessageOp2.value.includes('Negative Infinity')) {
+                errorMessageOp1.value =
+                    'Error: This operand represents Positive Infinity. Adding it to Negative Infinity is undefined.'
+                errorMessageOp2.value =
+                    'Error: This operand represents Negative Infinity. Adding it to Positive Infinity is undefined.'
+            } else if (errorMessageOp2.value.includes('Positive Infinity')) {
+                errorMessageOp1.value =
+                    'Error: This operand represents Positive Infinity. Adding it to Positive Infinity is Positive Infinity.'
+                errorMessageOp2.value =
+                    'Error: This operand represents Positive Infinity. Adding it to Positive Infinity is Positive Infinity.'
+            }
+        } else if (errorMessageOp1.value.includes('Negative Infinity')) {
+            if (errorMessageOp2.value.includes('Positive Infinity')) {
+                errorMessageOp1.value =
+                    'Error: This operand represents Negative Infinity. Adding it to Positive Infinity is undefined.'
+                errorMessageOp2.value =
+                    'Error: This operand represents Positive Infinity. Adding it to Negative Infinity is undefined.'
+            } else if (errorMessageOp2.value.includes('Negative Infinity')) {
+                errorMessageOp1.value =
+                    'Error: This operand represents Negative Infinity. Adding it to Negative Infinity is Negative Infinity.'
+                errorMessageOp2.value =
+                    'Error: This operand represents Negative Infinity. Adding it to Negative Infinity is Negative Infinity.'
+            }
+        }
+
+        if (
+            errorMessageOp1.value.startsWith('Error') ||
+            errorMessageOp2.value.startsWith('Error')
+        ) {
             showSimulation.value = false
             return
         }
