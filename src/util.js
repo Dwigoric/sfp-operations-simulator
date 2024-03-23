@@ -185,7 +185,7 @@ const normalizeSum = (rawSum) => {
     return normalizedSum
 }
 
-const RoundRTNTE = () => {
+const RoundRTNTE = (input, maxDigits) => {
 
 }
 
@@ -198,6 +198,32 @@ export { alignExponent, addOperands }
 
 
 //NOTES-------------------------------------
+
+// for round to nearest - ties to even:
+// 1. Substring slice the magnitude into two strings: magnitudeBody and remainingMagnitude
+//  - magnitudeBody is the string up until the max no. of digits
+//  - remainingMagnitude is the rest of the string
+
+// 2. process the remainingMagnitude string accordingly
+// 000 - do nothing
+// 001 - round down
+// 010 - round down
+// 011 - round down
+// 100 - ties to even
+// 101 - round up
+// 110 - round up
+// 111 - round up
+
+// 3. look for the first zero starting at the tail end of magnitudeBody (if no 0 found, skip to 4)
+// do nothing or round down - leave as is
+// round up - change to 1, change all 1's after it (if any) to 0
+// ties to even - if the tail of magnitudeBody is 0, leave as is; if 1, look for the first 0 from the tail and round up
+
+// 4. CASE FOR NO ZERO (all 1's)
+// do nothing or round down - leave as is
+// round up or ties to even - overflow exception
+
+// 5. DONE, magnitudeBody is now rounded!
 
 // op1: {
 //     sign: 0,
@@ -252,3 +278,8 @@ export { alignExponent, addOperands }
 //  formattedMagnitude = "1.10", but since its length is 2 while original is 4, add two "0"s
 //  formattedMagnitude = "1.1000" with an offset of -2
 //  Done
+
+// pls output as an array/object
+// - initial sum (not yet normalized/rounded)
+// - normalized
+// - rounded
