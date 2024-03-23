@@ -186,66 +186,60 @@ const normalizeSum = (rawSum) => {
 }
 
 const RoundRTNTE = (input, maxDigits) => {
-    
-    let magnitudeInput = input.magnitude;
 
-    while(magnitudeInput.length < maxDigits + 1){
+    let magnitudeInput = input.magnitude
+
+    while (magnitudeInput.length < maxDigits + 1) {
         magnitudeInput = magnitudeInput + '0'
     }
 
-    if (magnitudeInput.length == maxDigits+1){
+    if (magnitudeInput.length == maxDigits + 1) {
         return {
             sign: input.sign,
             exponent: input.exponent,
             magnitude: magnitudeInput
-        };
-    }
-
-    else {
-        let magnitudeBody = magnitudeInput.substring(0, maxDigits + 1);
-        const magnitudeRound = magnitudeInput.substring(maxDigits + 1);
-        const round1st = magnitudeRound[0];
+        }
+    } else {
+        let magnitudeBody = magnitudeInput.substring(0, maxDigits + 1)
+        const magnitudeRound = magnitudeInput.substring(maxDigits + 1)
+        const round1st = magnitudeRound[0]
         const roundOthers = magnitudeRound.substring(1)
-        
-        switch (round1st){
+
+        switch (round1st) {
             case '0':
                 //keep as is
-                break;
+                break
             case '1':
-                if(roundOthers.indexOf('1') != -1){
-                    let last0 = magnitudeBody.lastIndexOf('0');
-                    
-                    if(last0 != -1){
-                        let after0 = '';
-                        let remainingDigits = magnitudeBody.substring(last0+1).length;
+                if (roundOthers.indexOf('1') != -1) {
+                    let last0 = magnitudeBody.lastIndexOf('0')
 
-                        for(let i = 0; i<remainingDigits; i++){
-                            after0 = after0 + '0';
+                    if (last0 != -1) {
+                        let after0 = ''
+                        let remainingDigits = magnitudeBody.substring(last0 + 1).length
+
+                        for (let i = 0; i < remainingDigits; i++) {
+                            after0 = after0 + '0'
                         }
-                        magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0;
+                        magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0
+                    } else {
+                        throw new Error('Exception - overflow when attempting RTNTE')
                     }
-                    else{
-                        throw new Error("Exception - overflow when attempting RTNTE");
-                    }
-                }
-                else {
-                    if(magnitudeBody[magnitudeBody.length - 1] === 0){
-                        return input;
-                    }
-                    else {
-                        let last0 = magnitudeBody.lastIndexOf('0');
+                } else {
+                    if (magnitudeBody[magnitudeBody.length - 1] === 0) {
+                        return input
+                    } else {
+                        let last0 = magnitudeBody.lastIndexOf('0')
 
-                        if(last0 != -1){
-                            let after0 = '';
-                            let remainingDigits = magnitudeBody.substring(last0+1).length;
+                        if (last0 != -1) {
+                            let after0 = ''
+                            let remainingDigits = magnitudeBody.substring(last0 + 1).length
 
-                            for(let i = 0; i<remainingDigits; i++){
-                                after0 = after0 + '0';
+                            for (let i = 0; i < remainingDigits; i++) {
+                                after0 = after0 + '0'
                             }
-                            magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0;
-                        }
-                        else{
-                            throw new Error("Exception - overflow when attempting RTNTE");
+                            magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0
+                        } else {
+                            throw new Error('Exception - overflow when attempting RTNTE')
                         }
                     }
                 }
@@ -258,11 +252,11 @@ const RoundRTNTE = (input, maxDigits) => {
             magnitude: magnitudeBody
         }
 
-        return roundedInput;
+        return roundedInput
     }
 }
 
-export { alignExponent, addOperands }
+export { alignExponent, addOperands, useGRS, normalizeSum, RoundRTNTE }
 
 
 //NOTES-------------------------------------
