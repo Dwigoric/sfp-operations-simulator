@@ -219,6 +219,7 @@ const exportInfoToTextFile = () => {
     a.download = 'simulation.txt'
     a.click()
     URL.revokeObjectURL(url)
+    a.remove()
 }
 
 const simulate = () => {
