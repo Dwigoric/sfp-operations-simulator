@@ -7,7 +7,8 @@ import { addOperands, alignExponent, normalizeSum, RoundRTNTE, useGRS } from './
 
 // Refs
 const showSimulation = ref(false)
-const errorMessage = ref('')
+const errorMessageOp1 = ref('')
+const errorMessageOp2 = ref('')
 
 const useGrs = ref(false)
 const rawInput = ref(false)
@@ -113,56 +114,62 @@ const checkNumber = (e) => {
     }
 }
 
-const checkSpecialCase = (binary) => {
+const checkSpecialCase = (binary, errorMsgRef) => {
     const sign = parseInt(binary[0], 10)
     const eprime = binary.slice(1, 9)
     const mantissa = binary.slice(9)
 
+    let isSpecialCase = false
+
     // Zero or denormalized
     if (eprime === '0'.repeat(8)) {
+        isSpecialCase = true
+
         if (mantissa.includes('1')) {
             // Denormalized
-            errorMessage.value = 'Warning: Special Case - Denormalized'
+            errorMsgRef.value = 'Warning: Special Case - Denormalized'
         } else {
             // Zero
 
             // Positive
-            if (sign === 0) errorMessage.value = 'Warning: Special Case - Positive Zero'
+            if (sign === 0) errorMsgRef.value = 'Warning: Special Case - Positive Zero'
             // Negative
-            else errorMessage.value = 'Warning: Special Case - Negative Zero'
+            else errorMsgRef.value = 'Warning: Special Case - Negative Zero'
         }
     } else if (eprime === '1'.repeat(8)) {
+        isSpecialCase = true
+
         if (!mantissa.includes('1')) {
             // Infinity
 
             // Positive
-            if (sign === 0) errorMessage.value = 'Warning: Special Case - Positive Infinity'
+            if (sign === 0) errorMsgRef.value = 'Warning: Special Case - Positive Infinity'
             // Negative
-            else errorMessage.value = 'Warning: Special Case - Negative Infinity'
+            else errorMsgRef.value = 'Warning: Special Case - Negative Infinity'
         } else if (mantissa.startsWith('01')) {
             // Silent NaN
-            errorMessage.value = 'Error: Special Case - Silent NaN'
-            return false
+            errorMsgRef.value = 'Error: Special Case - Silent NaN'
+            return -1
         } else {
             // Quiet NaN
-            errorMessage.value = 'Error: Special Case - Quiet NaN'
-            return false
+            errorMsgRef.value = 'Error: Special Case - Quiet NaN'
+            return -1
         }
     }
 
-    return true
+    return isSpecialCase
 }
 
 const simulate = () => {
+    errorMessageOp1.value = ''
+    errorMessageOp2.value = ''
+
     // Check special cases if the input is raw binary
     if (rawInput.value) {
-        let isSpecialCase = checkSpecialCase(binary1.value)
-        if (!isSpecialCase) {
-            showSimulation.value = false
-            return
-        }
-        isSpecialCase = checkSpecialCase(binary2.value)
-        if (!isSpecialCase) {
+        const isSpecialCaseOp1 = checkSpecialCase(binary1.value, errorMessageOp1)
+        const isSpecialCaseOp2 = checkSpecialCase(binary2.value, errorMessageOp2)
+
+        if (isSpecialCaseOp1 === -1 || isSpecialCaseOp2 === -1) {
             showSimulation.value = false
             return
         }
@@ -373,7 +380,7 @@ const simulate = () => {
     <div id="add-button-wrapper">
         <VBtn
             :disabled="rawInput && (binary1.length < 32 || binary2.length < 32)"
-            class="bg-orange-darken-3"
+            class="bg-green-darken-3"
             @click.prevent="simulate"
         >
             <VIcon>mdi-plus</VIcon>
@@ -381,18 +388,39 @@ const simulate = () => {
         </VBtn>
     </div>
 
-    <VExpandTransition>
-        <VAlert v-if="errorMessage.startsWith('Error')" class="mx-10 mb-7 rounded-xl" type="error">
-            {{ errorMessage }}
+    <VDialogBottomTransition>
+        <VAlert
+            v-if="errorMessageOp1.startsWith('Error')"
+            class="mx-10 mb-7 rounded-xl"
+            type="error"
+        >
+            [OPERAND 1] {{ errorMessageOp1 }}
         </VAlert>
         <VAlert
-            v-else-if="errorMessage.startsWith('Warning')"
+            v-else-if="errorMessageOp1.startsWith('Warning')"
             class="mx-10 mb-7 rounded-xl"
             type="warning"
         >
-            {{ errorMessage }}
+            [OPERAND 1] {{ errorMessageOp1 }}
         </VAlert>
-    </VExpandTransition>
+    </VDialogBottomTransition>
+
+    <VDialogBottomTransition>
+        <VAlert
+            v-if="errorMessageOp2.startsWith('Error')"
+            class="mx-10 mb-7 rounded-xl"
+            type="error"
+        >
+            [OPERAND 2] {{ errorMessageOp2 }}
+        </VAlert>
+        <VAlert
+            v-else-if="errorMessageOp2.startsWith('Warning')"
+            class="mx-10 mb-7 rounded-xl"
+            type="warning"
+        >
+            [OPERAND 2] {{ errorMessageOp2 }}
+        </VAlert>
+    </VDialogBottomTransition>
 
     <VExpandTransition>
         <div v-if="showSimulation" id="steps-wrapper">
