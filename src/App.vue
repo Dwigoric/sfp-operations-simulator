@@ -150,6 +150,77 @@ const checkSpecialCase = (binary, errorMsgRef) => {
     }
 }
 
+const exportInfoToTextFile = () => {
+    const data = [
+        'Step 0: Convert binary to normalized form',
+        'Operand 1:',
+        `Sign: ${info.op1.sign}`,
+        `Exponent: ${info.op1.exponent}`,
+        `Mantissa: ${info.op1.mantissa}`,
+        `Base-2 form: ${info.op1.sign === 1 ? '-' : '+'}1.${info.op1.mantissa} * 2^${info.op1.exponent}`,
+        '',
+        'Operand 2:',
+        `Sign: ${info.op2.sign}`,
+        `Exponent: ${info.op2.exponent}`,
+        `Mantissa: ${info.op2.mantissa}`,
+        `Base-2 form: ${info.op2.sign === 1 ? '-' : '+'}1.${info.op2.mantissa} * 2^${info.op2.exponent}`,
+        '',
+        'Step 1: Align the exponents',
+        info.op1.exponent === info.op2.exponent
+            ? 'Since the exponents are already aligned, no further action is needed.'
+            : 'Align the exponents in favor of the operand with the larger exponent.',
+        'Aligned Operand 1:',
+        `Sign: ${info.aligned.op1.sign}`,
+        `Exponent: ${info.aligned.op1.exponent}`,
+        `Magnitude: ${info.aligned.op1.magnitude}`,
+        '',
+        'Aligned Operand 2:',
+        `Sign: ${info.aligned.op2.sign}`,
+        `Exponent: ${info.aligned.op2.exponent}`,
+        `Magnitude: ${info.aligned.op2.magnitude}`,
+        '',
+        'Step 2: Perform binary addition',
+        'Perform binary addition on the aligned operands.',
+        'Pre-addition Operand 1:',
+        `Sign: ${info.preAdd.op1.sign}`,
+        `Exponent: ${info.preAdd.op1.exponent}`,
+        `Magnitude: ${info.preAdd.op1.magnitude}`,
+        '',
+        'Pre-addition Operand 2:',
+        `Sign: ${info.preAdd.op2.sign}`,
+        `Exponent: ${info.preAdd.op2.exponent}`,
+        `Magnitude: ${info.preAdd.op2.magnitude}`,
+        '',
+        'Sum:',
+        `Sign: ${info.rawSum.sign}`,
+        `Exponent: ${info.rawSum.exponent}`,
+        `Magnitude: ${info.rawSum.magnitude}`,
+        '',
+        'Step 3: Normalize the result',
+        info.rawSum.magnitude.includes('1')
+            ? [
+                  'Normalized Sum:',
+                  `Sign: ${info.normalizedSum.sign}`,
+                  `Exponent: ${info.normalizedSum.exponent}`,
+                  `Magnitude: ${info.normalizedSum.magnitude}`
+              ].join('\n')
+            : 'Since the sum is 0, no further action is needed.',
+        '',
+        'Step 4: Round the result',
+        'Final Sum:',
+        `Sign: ${info.finalSum.sign}`,
+        `Exponent: ${info.finalSum.exponent}`,
+        `Magnitude: ${info.finalSum.magnitude}`
+    ].join('\n')
+    const blob = new Blob([data], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'simulation.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+}
+
 const simulate = () => {
     errorMessageOp1.value = ''
     errorMessageOp2.value = ''
@@ -394,15 +465,23 @@ const simulate = () => {
         </div>
     </VExpandTransition>
 
-    <div id="add-button-wrapper">
+    <div id="button-wrapper">
         <VBtn
             :disabled="rawInput && (binary1.length < 32 || binary2.length < 32)"
-            class="bg-green-darken-3"
+            class="bg-green-darken-3 w-25 align-self-center"
             @click.prevent="simulate"
         >
             <VIcon>mdi-plus</VIcon>
             <span>Add</span>
         </VBtn>
+        <VExpandTransition>
+            <VBtn
+                v-if="showSimulation"
+                class="bg-lime-darken-3 w-25 align-self-center mt-5"
+                @click.prevent="exportInfoToTextFile"
+                >Export Data
+            </VBtn>
+        </VExpandTransition>
     </div>
 
     <VDialogBottomTransition>
@@ -644,10 +723,11 @@ const simulate = () => {
     width: 36rem;
 }
 
-#add-button-wrapper {
+#button-wrapper {
     width: 100%;
     padding: 3rem 0;
     display: flex;
+    flex-flow: column nowrap;
     justify-content: center;
 }
 
