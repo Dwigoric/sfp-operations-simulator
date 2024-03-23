@@ -7,6 +7,7 @@ import { addOperands, alignExponent, normalizeSum, RoundRTNTE, useGRS } from './
 
 // Refs
 const showSimulation = ref(false)
+const errorMessage = ref('')
 
 const useGrs = ref(false)
 const rawInput = ref(false)
@@ -112,7 +113,61 @@ const checkNumber = (e) => {
     }
 }
 
+const checkSpecialCase = (binary) => {
+    const sign = parseInt(binary[0], 10)
+    const eprime = binary.slice(1, 9)
+    const mantissa = binary.slice(9)
+
+    // Zero or denormalized
+    if (eprime === '0'.repeat(8)) {
+        if (mantissa.includes('1')) {
+            // Denormalized
+            errorMessage.value = 'Warning: Special Case - Denormalized'
+        } else {
+            // Zero
+
+            // Positive
+            if (sign === 0) errorMessage.value = 'Warning: Special Case - Positive Zero'
+            // Negative
+            else errorMessage.value = 'Warning: Special Case - Negative Zero'
+        }
+    } else if (eprime === '1'.repeat(8)) {
+        if (!mantissa.includes('1')) {
+            // Infinity
+
+            // Positive
+            if (sign === 0) errorMessage.value = 'Warning: Special Case - Positive Infinity'
+            // Negative
+            else errorMessage.value = 'Warning: Special Case - Negative Infinity'
+        } else if (mantissa.startsWith('01')) {
+            // Silent NaN
+            errorMessage.value = 'Error: Special Case - Silent NaN'
+            return false
+        } else {
+            // Quiet NaN
+            errorMessage.value = 'Error: Special Case - Quiet NaN'
+            return false
+        }
+    }
+
+    return true
+}
+
 const simulate = () => {
+    // Check special cases if the input is raw binary
+    if (rawInput.value) {
+        let isSpecialCase = checkSpecialCase(binary1.value)
+        if (!isSpecialCase) {
+            showSimulation.value = false
+            return
+        }
+        isSpecialCase = checkSpecialCase(binary2.value)
+        if (!isSpecialCase) {
+            showSimulation.value = false
+            return
+        }
+    }
+
     showSimulation.value = true
 
     if (rawInput.value) {
@@ -325,6 +380,19 @@ const simulate = () => {
             <span>Add</span>
         </VBtn>
     </div>
+
+    <VExpandTransition>
+        <VAlert v-if="errorMessage.startsWith('Error')" class="mx-10 mb-7 rounded-xl" type="error">
+            {{ errorMessage }}
+        </VAlert>
+        <VAlert
+            v-else-if="errorMessage.startsWith('Warning')"
+            class="mx-10 mb-7 rounded-xl"
+            type="warning"
+        >
+            {{ errorMessage }}
+        </VAlert>
+    </VExpandTransition>
 
     <VExpandTransition>
         <div v-if="showSimulation" id="steps-wrapper">
