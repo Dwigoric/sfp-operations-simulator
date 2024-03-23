@@ -224,11 +224,17 @@ const RoundRTNTE = (input, maxDigits) => {
                     } else {
                         throw new Error('Exception - overflow when attempting RTNTE')
                     }
-                } else {
-                    if (magnitudeBody[magnitudeBody.length - 1] === 0) {
-                        return input
-                    } else {
-                        let last0 = magnitudeBody.lastIndexOf('0')
+                }
+                else {
+                    if(magnitudeBody[magnitudeBody.length - 1] === 0){
+                        return {
+                            sign: input.sign,
+                            exponent: input.exponent,
+                            magnitude: magnitudeBody
+                        };
+                    }
+                    else {
+                        let last0 = magnitudeBody.lastIndexOf('0');
 
                         if (last0 != -1) {
                             let after0 = ''
