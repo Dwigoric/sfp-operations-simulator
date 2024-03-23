@@ -186,7 +186,80 @@ const normalizeSum = (rawSum) => {
 }
 
 const RoundRTNTE = (input, maxDigits) => {
+    
+    let magnitudeInput = input.magnitude;
 
+    while(magnitudeInput.length < maxDigits + 1){
+        magnitudeInput = magnitudeInput + '0'
+    }
+
+    if (magnitudeInput.length == maxDigits+1){
+        return {
+            sign: input.sign,
+            exponent: input.exponent,
+            magnitude: magnitudeInput
+        };
+    }
+
+    else {
+        let magnitudeBody = magnitudeInput.substring(0, maxDigits + 1);
+        const magnitudeRound = magnitudeInput.substring(maxDigits + 1);
+        const round1st = magnitudeRound[0];
+        const roundOthers = magnitudeRound.substring(1)
+        
+        switch (round1st){
+            case '0':
+                //keep as is
+                break;
+            case '1':
+                if(roundOthers.indexOf('1') != -1){
+                    let last0 = magnitudeBody.lastIndexOf('0');
+                    
+                    if(last0 != -1){
+                        let after0 = '';
+                        let remainingDigits = magnitudeBody.substring(last0+1).length;
+
+                        for(let i = 0; i<remainingDigits; i++){
+                            after0 = after0 + '0';
+                        }
+                        magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0;
+                    }
+                    else{
+                        throw new Error("Exception - overflow when attempting RTNTE");
+                    }
+                }
+                else {
+                    if(magnitudeBody[magnitudeBody.length - 1] === 0){
+                        return input;
+                    }
+                    else {
+                        let last0 = magnitudeBody.lastIndexOf('0');
+
+                        if(last0 != -1){
+                            let after0 = '';
+                            let remainingDigits = magnitudeBody.substring(last0+1).length;
+
+                            for(let i = 0; i<remainingDigits; i++){
+                                after0 = after0 + '0';
+                            }
+                            magnitudeBody = magnitudeBody.substring(0, last0) + '1' + after0;
+                        }
+                        else{
+                            throw new Error("Exception - overflow when attempting RTNTE");
+                        }
+                    }
+                }
+
+        }
+
+        const roundedInput = {
+            sign: input.sign,
+            exponent: input.exponent,
+            magnitude: magnitudeBody
+        }
+
+        return roundedInput;
+    }
 }
 
 const RoundGRS = () => {
@@ -224,6 +297,10 @@ export { alignExponent, addOperands }
 // round up or ties to even - overflow exception
 
 // 5. DONE, magnitudeBody is now rounded!
+
+// ex. RTN-TE 0.100101 to 5 digits
+// - body = 0.1001, remaining = 01
+
 
 // op1: {
 //     sign: 0,
