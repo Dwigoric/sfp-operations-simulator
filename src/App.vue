@@ -6,6 +6,8 @@ import { reactive, ref } from 'vue'
 import { addOperands, alignExponent, normalizeSum, RoundRTNTE, useGRS } from './util.js'
 
 // Refs
+const showSimulation = ref(false)
+
 const useGrs = ref(false)
 const rawInput = ref(false)
 const bitsSupported = ref(23)
@@ -111,6 +113,8 @@ const checkNumber = (e) => {
 }
 
 const simulate = () => {
+    showSimulation.value = true
+
     if (rawInput.value) {
         info.op1.sign = parseInt(binary1.value[0], 10)
         info.op1.exponent = parseInt(binary1.value.slice(1, 9), 2) - 127
@@ -322,134 +326,139 @@ const simulate = () => {
         </VBtn>
     </div>
 
-    <div id="steps-wrapper">
-        <h2>Step-by-Step Simulation</h2>
-        <VList class="bg-brown-darken-2 rounded-xl">
-            <VExpandTransition>
-                <VListGroup v-if="rawInput" value="Step-0">
+    <VExpandTransition>
+        <div v-if="showSimulation" id="steps-wrapper">
+            <h2>Step-by-Step Simulation</h2>
+            <VList class="bg-brown-darken-2 rounded-xl">
+                <VExpandTransition>
+                    <VListGroup v-if="rawInput" value="Step-0">
+                        <template #activator="{ props }">
+                            <VListItem
+                                title="Step 0. Convert binary to normalized form"
+                                v-bind="props"
+                            />
+                        </template>
+                        <div class="steps-list">
+                            <h3>
+                                Split the binary numbers into their sign, exponent, and mantissa
+                                parts
+                            </h3>
+                            <div class="binary-split">
+                                <div>
+                                    <h4>Binary 1</h4>
+                                    <p>Sign: {{ info.op1.sign }}</p>
+                                    <p>Exponent: {{ info.op1.exponent }}</p>
+                                    <p>Mantissa: {{ info.op1.mantissa }}</p>
+                                </div>
+                                <div>
+                                    <h4>Binary 2</h4>
+                                    <p>Sign: {{ info.op2.sign }}</p>
+                                    <p>Exponent: {{ info.op2.exponent }}</p>
+                                    <p>Mantissa: {{ info.op2.mantissa }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="steps-list">
+                            <h3>Formulate the base-2 form</h3>
+                            <div class="binary-split">
+                                <p>
+                                    Operand 1: {{ info.op1.sign === 1 ? '-' : '+' }}1.{{
+                                        info.op1.mantissa
+                                    }}
+                                    * 2^{{ info.op1.exponent }}
+                                </p>
+                                <p>
+                                    Operand 2: {{ info.op2.sign === 1 ? '-' : '+' }}1.{{
+                                        info.op2.mantissa
+                                    }}
+                                    * 2^{{ info.op2.exponent }}
+                                </p>
+                            </div>
+                        </div>
+                    </VListGroup>
+                </VExpandTransition>
+                <VListGroup>
                     <template #activator="{ props }">
-                        <VListItem
-                            title="Step 0. Convert binary to normalized form"
-                            v-bind="props"
-                        />
+                        <VListItem title="Step 1. Align the exponents" v-bind="props" />
                     </template>
-                    <div class="steps-list">
+                    <h3 v-if="info.op1.exponent === info.op2.exponent" class="steps-list">
+                        Since the exponents are already aligned, no further action is needed.
+                    </h3>
+                    <div v-else class="steps-list">
                         <h3>
-                            Split the binary numbers into their sign, exponent, and mantissa parts
+                            Align the exponents in favor of the operand with the larger exponent.
                         </h3>
                         <div class="binary-split">
                             <div>
-                                <h4>Binary 1</h4>
-                                <p>Sign: {{ info.op1.sign }}</p>
-                                <p>Exponent: {{ info.op1.exponent }}</p>
-                                <p>Mantissa: {{ info.op1.mantissa }}</p>
+                                <h4>Aligned Operand 1</h4>
+                                <p>Sign: {{ info.aligned.op1.sign }}</p>
+                                <p>Exponent: {{ info.aligned.op1.exponent }}</p>
+                                <p>Magnitude: {{ info.aligned.op1.magnitude }}</p>
                             </div>
                             <div>
-                                <h4>Binary 2</h4>
-                                <p>Sign: {{ info.op2.sign }}</p>
-                                <p>Exponent: {{ info.op2.exponent }}</p>
-                                <p>Mantissa: {{ info.op2.mantissa }}</p>
+                                <h4>Aligned Operand 2</h4>
+                                <p>Sign: {{ info.aligned.op2.sign }}</p>
+                                <p>Exponent: {{ info.aligned.op2.exponent }}</p>
+                                <p>Magnitude: {{ info.aligned.op2.magnitude }}</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="steps-list">
-                        <h3>Formulate the base-2 form</h3>
-                        <div class="binary-split">
-                            <p>
-                                Operand 1: {{ info.op1.sign === 1 ? '-' : '+' }}1.{{
-                                    info.op1.mantissa
-                                }}
-                                * 2^{{ info.op1.exponent }}
-                            </p>
-                            <p>
-                                Operand 2: {{ info.op2.sign === 1 ? '-' : '+' }}1.{{
-                                    info.op2.mantissa
-                                }}
-                                * 2^{{ info.op2.exponent }}
-                            </p>
                         </div>
                     </div>
                 </VListGroup>
-            </VExpandTransition>
-            <VListGroup>
-                <template #activator="{ props }">
-                    <VListItem title="Step 1. Align the exponents" v-bind="props" />
-                </template>
-                <h3 v-if="info.op1.exponent === info.op2.exponent" class="steps-list">
-                    Since the exponents are already aligned, no further action is needed.
-                </h3>
-                <div v-else class="steps-list">
-                    <h3>Align the exponents in favor of the operand with the larger exponent.</h3>
-                    <div class="binary-split">
-                        <div>
-                            <h4>Aligned Operand 1</h4>
-                            <p>Sign: {{ info.aligned.op1.sign }}</p>
-                            <p>Exponent: {{ info.aligned.op1.exponent }}</p>
-                            <p>Magnitude: {{ info.aligned.op1.magnitude }}</p>
+                <VListGroup>
+                    <template #activator="{ props }">
+                        <VListItem title="Step 2. Perform binary addition" v-bind="props" />
+                    </template>
+                    <div class="steps-list">
+                        <h3>Perform binary addition on the aligned operands.</h3>
+                        <div class="binary-split">
+                            <div>
+                                <h4>Pre-addition Operand 1</h4>
+                                <p>Sign: {{ info.preAdd.op1.sign }}</p>
+                                <p>Exponent: {{ info.preAdd.op1.exponent }}</p>
+                                <p>Magnitude: {{ info.preAdd.op1.magnitude }}</p>
+                            </div>
+                            <div>
+                                <h4>Pre-addition Operand 2</h4>
+                                <p>Sign: {{ info.preAdd.op2.sign }}</p>
+                                <p>Exponent: {{ info.preAdd.op2.exponent }}</p>
+                                <p>Magnitude: {{ info.preAdd.op2.magnitude }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4>Aligned Operand 2</h4>
-                            <p>Sign: {{ info.aligned.op2.sign }}</p>
-                            <p>Exponent: {{ info.aligned.op2.exponent }}</p>
-                            <p>Magnitude: {{ info.aligned.op2.magnitude }}</p>
-                        </div>
-                    </div>
-                </div>
-            </VListGroup>
-            <VListGroup>
-                <template #activator="{ props }">
-                    <VListItem title="Step 2. Perform binary addition" v-bind="props" />
-                </template>
-                <div class="steps-list">
-                    <h3>Perform binary addition on the aligned operands.</h3>
-                    <div class="binary-split">
-                        <div>
-                            <h4>Pre-addition Operand 1</h4>
-                            <p>Sign: {{ info.preAdd.op1.sign }}</p>
-                            <p>Exponent: {{ info.preAdd.op1.exponent }}</p>
-                            <p>Magnitude: {{ info.preAdd.op1.magnitude }}</p>
-                        </div>
-                        <div>
-                            <h4>Pre-addition Operand 2</h4>
-                            <p>Sign: {{ info.preAdd.op2.sign }}</p>
-                            <p>Exponent: {{ info.preAdd.op2.exponent }}</p>
-                            <p>Magnitude: {{ info.preAdd.op2.magnitude }}</p>
+                        <div class="binary-split">
+                            <div>
+                                <h4>Sum</h4>
+                                <p>Sign: {{ info.rawSum.sign }}</p>
+                                <p>Exponent: {{ info.rawSum.exponent }}</p>
+                                <p>Magnitude: {{ info.rawSum.magnitude }}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="binary-split">
-                        <div>
-                            <h4>Sum</h4>
-                            <p>Sign: {{ info.rawSum.sign }}</p>
-                            <p>Exponent: {{ info.rawSum.exponent }}</p>
-                            <p>Magnitude: {{ info.rawSum.magnitude }}</p>
-                        </div>
+                </VListGroup>
+                <VListGroup>
+                    <template #activator="{ props }">
+                        <VListItem title="Step 3. Normalize the result" v-bind="props" />
+                    </template>
+                    <div class="steps-list">
+                        <h3>Normalized Sum</h3>
+                        <p>Sign: {{ info.normalizedSum.sign }}</p>
+                        <p>Exponent: {{ info.normalizedSum.exponent }}</p>
+                        <p>Magnitude: {{ info.normalizedSum.magnitude }}</p>
                     </div>
-                </div>
-            </VListGroup>
-            <VListGroup>
-                <template #activator="{ props }">
-                    <VListItem title="Step 3. Normalize the result" v-bind="props" />
-                </template>
-                <div class="steps-list">
-                    <h3>Normalized Sum</h3>
-                    <p>Sign: {{ info.normalizedSum.sign }}</p>
-                    <p>Exponent: {{ info.normalizedSum.exponent }}</p>
-                    <p>Magnitude: {{ info.normalizedSum.magnitude }}</p>
-                </div>
-            </VListGroup>
-            <VListGroup>
-                <template #activator="{ props }">
-                    <VListItem title="Step 4. Round the result" v-bind="props" />
-                </template>
-                <div class="steps-list">
-                    <h3>Final Sum</h3>
-                    <p>Sign: {{ info.finalSum.sign }}</p>
-                    <p>Exponent: {{ info.finalSum.exponent }}</p>
-                    <p>Magnitude: {{ info.finalSum.magnitude }}</p>
-                </div>
-            </VListGroup>
-        </VList>
-    </div>
+                </VListGroup>
+                <VListGroup>
+                    <template #activator="{ props }">
+                        <VListItem title="Step 4. Round the result" v-bind="props" />
+                    </template>
+                    <div class="steps-list">
+                        <h3>Final Sum</h3>
+                        <p>Sign: {{ info.finalSum.sign }}</p>
+                        <p>Exponent: {{ info.finalSum.exponent }}</p>
+                        <p>Magnitude: {{ info.finalSum.magnitude }}</p>
+                    </div>
+                </VListGroup>
+            </VList>
+        </div>
+    </VExpandTransition>
 </template>
 
 <style scoped>
