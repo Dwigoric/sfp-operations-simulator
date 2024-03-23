@@ -262,11 +262,6 @@ const RoundRTNTE = (input, maxDigits) => {
     }
 }
 
-const RoundGRS = () => {
-
-}
-
-
 export { alignExponent, addOperands }
 
 
