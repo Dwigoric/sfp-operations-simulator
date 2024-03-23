@@ -3,12 +3,12 @@
 import { reactive, ref } from 'vue'
 
 // Utils
-import { alignExponent } from './util.js'
+import { addOperands, alignExponent, RoundRTNTE, useGRS } from './util.js'
 
 // Refs
 const useGrs = ref(false)
 const rawInput = ref(false)
-const bitsSupported = ref(10)
+const bitsSupported = ref(23)
 
 const binary1 = ref('001111111' + '0'.repeat(23))
 const binary2 = ref('001111111' + '0'.repeat(23))
@@ -47,6 +47,23 @@ const info = reactive({
             exponent: 0,
             magnitude: '1.0000000'
         }
+    },
+    preAdd: {
+        op1: {
+            sign: 0,
+            exponent: 0,
+            magnitude: '1.0000000'
+        },
+        op2: {
+            sign: 0,
+            exponent: 0,
+            magnitude: '1.0000000'
+        }
+    },
+    rawSum: {
+        sign: 0,
+        exponent: 0,
+        magnitude: '10.0000000'
     }
 })
 
@@ -103,9 +120,39 @@ const simulate = () => {
     }
 
     // Step 1: Align the exponents
-    const aligned = alignExponent(info.op1, info.op2)
-    info.aligned.op1 = aligned.op1
-    info.aligned.op2 = aligned.op2
+    if (info.op1.exponent === info.op2.exponent) {
+        info.aligned.op1 = {
+            sign: info.op1.sign,
+            exponent: info.op1.exponent,
+            magnitude: '1.' + info.op1.mantissa
+        }
+        info.aligned.op2 = {
+            sign: info.op2.sign,
+            exponent: info.op2.exponent,
+            magnitude: '1.' + info.op2.mantissa
+        }
+    } else {
+        const aligned = alignExponent(info.op1, info.op2)
+        info.aligned.op1 = aligned.op1
+        info.aligned.op2 = aligned.op2
+    }
+
+    // Step 2: Perform binary addition
+    if (useGrs.value) {
+        info.preAdd.op1 = useGRS(info.aligned.op1, bitsSupported.value).result
+        info.preAdd.op2 = useGRS(info.aligned.op2, bitsSupported.value).result
+    } else {
+        info.preAdd.op1 = RoundRTNTE(info.aligned.op1, bitsSupported.value)
+        info.preAdd.op2 = RoundRTNTE(info.aligned.op2, bitsSupported.value)
+    }
+    info.rawSum = addOperands(info.preAdd.op1, info.preAdd.op2).result
+
+    // Step 3: Normalize sum
+    // Skip to round if the sum is 0
+
+    // Step 4: Round
+
+    // Step 5: Export to text file
 }
 </script>
 
@@ -335,6 +382,31 @@ const simulate = () => {
                 <template #activator="{ props }">
                     <VListItem title="Step 2. Perform binary addition" v-bind="props" />
                 </template>
+                <div class="steps-list">
+                    <h3>Perform binary addition on the aligned operands.</h3>
+                    <div class="binary-split">
+                        <div>
+                            <h4>Pre-addition Operand 1</h4>
+                            <p>Sign: {{ info.preAdd.op1.sign }}</p>
+                            <p>Exponent: {{ info.preAdd.op1.exponent }}</p>
+                            <p>Magnitude: {{ info.preAdd.op1.magnitude }}</p>
+                        </div>
+                        <div>
+                            <h4>Pre-addition Operand 2</h4>
+                            <p>Sign: {{ info.preAdd.op2.sign }}</p>
+                            <p>Exponent: {{ info.preAdd.op2.exponent }}</p>
+                            <p>Magnitude: {{ info.preAdd.op2.magnitude }}</p>
+                        </div>
+                    </div>
+                    <div class="binary-split">
+                        <div>
+                            <h4>Sum</h4>
+                            <p>Sign: {{ info.rawSum.sign }}</p>
+                            <p>Exponent: {{ info.rawSum.exponent }}</p>
+                            <p>Magnitude: {{ info.rawSum.magnitude }}</p>
+                        </div>
+                    </div>
+                </div>
             </VListGroup>
             <VListGroup>
                 <template #activator="{ props }">
