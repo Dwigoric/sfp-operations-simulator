@@ -56,7 +56,7 @@ const mantissaBinaryToDecimal = (mantissa) => { // 1010101
         const power = -(i + 1)
         const bit = mantissa[i]
 
-        if (bit === 1) {
+        if (bit === '1') { // Comparison corrected here
             decimal += Math.pow(2, power)
         }
     }
@@ -64,17 +64,18 @@ const mantissaBinaryToDecimal = (mantissa) => { // 1010101
     return decimal
 }
 
-const decimalToBinary = (decimal) => {
-    if (decimal === 0) {
-        return '0'
-    }
-
+const decimalToBinary = (decimalPart, precision) => {
     let binary = ''
-    while (decimal > 0) {
-        binary = (decimal % 2) + binary
-        decimal = Math.floor(decimal / 2)
+    while (precision > 0) {
+        decimalPart *= 2
+        if (decimalPart >= 1) {
+            binary += '1'
+            decimalPart -= 1
+        } else {
+            binary += '0'
+        }
+        precision--
     }
-
     return binary
 }
 
@@ -119,32 +120,40 @@ const addOperands = (op1, op2) => {
     let op1Partition = op1.magnitude.split('.')
     let op2Partition = op2.magnitude.split('.')
 
-    // binary to decimal
-    let value1 = parseInt(op1Partition[0]) + mantissaBinaryToDecimal(op1Partition[1])
-    let value2 = parseInt(op2Partition[0]) + mantissaBinaryToDecimal(op2Partition[1])
 
-    let initialSum = 0
+    // binary to decimal
+    let value1mantissa = mantissaBinaryToDecimal(op1Partition[1])
+    let value2mantissa = mantissaBinaryToDecimal(op2Partition[1])
+
+    let initialMantissa = 0
     let exponent = op1.exponent
     let sign = 0
 
     // addition
     if (op1.sign === op2.sign) {
-        initialSum = value1 + value2
+        initialMantissa = value1mantissa + value2mantissa
         sign = op1.sign && op2.sign
     } else {
-        if (value1 > value2) {
-            initialSum = value1 - value2
+        if (value1mantissa > value2mantissa) {
+            initialMantissa = value1mantissa - value2mantissa
             sign = op1.sign
-        } else if (value1 < value2) {
-            initialSum = value2 - value1
+        } else if (value1mantissa < value2mantissa) {
+            initialMantissa = value2mantissa - value1mantissa
             sign = op2.sign
         } else { // Subtraction
-            initialSum = value1 - value2
+            initialMantissa = value1mantissa - value2mantissa
             sign = 0
         }
     }
 
-    initialSum = decimalToBinary(initialSum)
+    //wholeNumber.toString(2); // convert to binary
+
+    let wholeNumberPart = (parseInt(op1Partition[0]) + parseInt(op2Partition[0])).toString(2)
+    let lengthOfInitialMantissa = String(initialMantissa)
+    initialMantissa = decimalToBinary(initialMantissa, lengthOfInitialMantissa.length)
+    let initialSum = wholeNumberPart + '.' + initialMantissa
+
+    //initialSum = decimalToBinary(initialSum) // 2 . 242412
 
     return {
         result: {
@@ -224,17 +233,15 @@ const RoundRTNTE = (input, maxDigits) => {
                     } else {
                         throw new Error('Exception - overflow when attempting RTNTE')
                     }
-                }
-                else {
-                    if(magnitudeBody[magnitudeBody.length - 1] === 0){
+                } else {
+                    if (magnitudeBody[magnitudeBody.length - 1] === 0) {
                         return {
                             sign: input.sign,
                             exponent: input.exponent,
                             magnitude: magnitudeBody
-                        };
-                    }
-                    else {
-                        let last0 = magnitudeBody.lastIndexOf('0');
+                        }
+                    } else {
+                        let last0 = magnitudeBody.lastIndexOf('0')
 
                         if (last0 != -1) {
                             let after0 = ''
