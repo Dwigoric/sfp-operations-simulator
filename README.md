@@ -1,6 +1,7 @@
 # Single-Precision Floating-Point Addition Simulator 
 
 A simulator for the addition of two single-precision floating-point binary numbers.
+
 Web App Link: https://sfp-adder.pages.dev/
 
 ## Recommended IDE Setup
