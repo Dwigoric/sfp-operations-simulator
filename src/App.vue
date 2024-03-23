@@ -286,6 +286,10 @@ const simulate = () => {
         info.op2.mantissa = base2_2.mantissa
     }
 
+    // Trim trailing zeros (except if it's the only zero) from mantissa
+    info.op1.mantissa = info.op1.mantissa.replace(/0+$/, '') || '0'
+    info.op2.mantissa = info.op2.mantissa.replace(/0+$/, '') || '0'
+
     // Step 1: Align the exponents
     if (info.op1.exponent === info.op2.exponent) {
         info.aligned.op1 = {
