@@ -69,6 +69,11 @@ const info = reactive({
         sign: 0,
         exponent: 1,
         magnitude: '1.0000000'
+    },
+    finalSum: {
+        sign: 0,
+        exponent: 1,
+        magnitude: '1.0000000'
     }
 })
 
@@ -159,6 +164,11 @@ const simulate = () => {
         : info.rawSum
 
     // Step 4: Round
+    if (useGrs.value) {
+        info.finalSum = useGRS(info.normalizedSum, bitsSupported.value).result
+    } else {
+        info.finalSum = RoundRTNTE(info.normalizedSum, bitsSupported.value)
+    }
 
     // Step 5: Export to text file
 }
@@ -431,6 +441,12 @@ const simulate = () => {
                 <template #activator="{ props }">
                     <VListItem title="Step 4. Round the result" v-bind="props" />
                 </template>
+                <div class="steps-list">
+                    <h3>Final Sum</h3>
+                    <p>Sign: {{ info.finalSum.sign }}</p>
+                    <p>Exponent: {{ info.finalSum.exponent }}</p>
+                    <p>Magnitude: {{ info.finalSum.magnitude }}</p>
+                </div>
             </VListGroup>
         </VList>
     </div>
