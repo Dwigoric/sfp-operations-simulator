@@ -254,8 +254,6 @@ const simulate = () => {
     } else {
         info.finalSum = RoundRTNTE(info.normalizedSum, bitsSupported.value)
     }
-
-    // Step 5: Export to text file
 }
 </script>
 
@@ -553,7 +551,10 @@ const simulate = () => {
                     <template #activator="{ props }">
                         <VListItem title="Step 3. Normalize the result" v-bind="props" />
                     </template>
-                    <div class="steps-list">
+                    <h3 v-if="!info.rawSum.magnitude.includes('1')" class="steps-list">
+                        Since the sum is 0, no further action is needed.
+                    </h3>
+                    <div v-else class="steps-list">
                         <h3>Normalized Sum</h3>
                         <p>Sign: {{ info.normalizedSum.sign }}</p>
                         <p>Exponent: {{ info.normalizedSum.exponent }}</p>
