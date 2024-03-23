@@ -149,6 +149,14 @@ const normalizeSum = (rawSum) => {
     return normalizedSum
 }
 
+const RoundRTNTE = () => {
+
+}
+
+const RoundGRS = () => {
+    
+}
+
 export { alignExponent, addOperands }
 
 
